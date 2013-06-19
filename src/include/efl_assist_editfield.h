@@ -88,7 +88,7 @@ Evas_Object *ea_editfield_add(Evas_Object *parent, Ea_Editfield_Type type);
  *                     EINA_FALSE : the clear button will be shown or hidden automatically
  *
  */
-EXPORT_API void ea_editfield_clear_button_disabled_set(Evas_Object *obj, Eina_Bool disable);
+void ea_editfield_clear_button_disabled_set(Evas_Object *obj, Eina_Bool disable);
 
 /**
  * @brief Get the disabled state of the clear button.
@@ -104,7 +104,7 @@ EXPORT_API void ea_editfield_clear_button_disabled_set(Evas_Object *obj, Eina_Bo
  * @return return the disabled state of the clear button
  *
  */
-EXPORT_API Eina_Bool ea_editfield_clear_button_disabled_get(Evas_Object *obj);
+Eina_Bool ea_editfield_clear_button_disabled_get(Evas_Object *obj);
 
 /**
  * @}
