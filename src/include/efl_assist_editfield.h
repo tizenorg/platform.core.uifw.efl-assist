@@ -75,6 +75,35 @@ typedef enum
 Evas_Object *ea_editfield_add(Evas_Object *parent, Ea_Editfield_Type type);
 
 /**
+ * @brief Disable the clear button. It makes the clear button be hidden always or not.
+ *
+ * @details Disable the clear button. If @param disable is EINA_TRUE, it will hide the clear button always.
+ *          If @param disable is EINA_FALSE, the clear button will be shown or hidden automatically.
+ *
+ * @param [in] obj the entry widget object
+ * @param [in] disable EINA_TRUE : the clear button will be hidden always
+ *                     EINA_FALSE : the clear button will be shown or hidden automatically
+ *
+ */
+EXPORT_API void ea_editfield_clear_button_disabled_set(Evas_Object *obj, Eina_Bool disable);
+
+/**
+ * @brief Get the disabled state of the clear button.
+ *
+ * @details Get the disabled state of clear button. It was seted by ea_editfield_clear_button_disabled_set.
+ *          If @return is EINA_TRUE, the clear button was hidden always.
+ *          If @return is EINA_FALSE, the clear button will be shown or hidden automatically.
+ *
+ * @see ea_editfield_clear_button_disabled_set()
+ *
+ * @param [in] obj the entry widget object
+ *
+ * @return return the disabled state of the clear button
+ *
+ */
+EXPORT_API Eina_Bool ea_editfield_clear_button_disabled_get(Evas_Object *obj);
+
+/**
  * @}
  */
 

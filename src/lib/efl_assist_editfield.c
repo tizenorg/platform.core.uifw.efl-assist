@@ -1,9 +1,20 @@
 #include "efl_assist.h"
 #include "efl_assist_private.h"
 
+const char *EA_EF_KEY_DATA = "_ea_ef_key_data";
+
+typedef struct _Ea_Editfield_Data
+{
+   Eina_Bool clear_btn_disabled;
+} Ea_Editfield_Data;
+
 static void _editfield_changed_cb(void *data, Evas_Object *obj, void *event_info)
 {
-   if (elm_object_part_content_get(obj, "elm.swallow.clear"))
+   Ea_Editfield_Data *eed;
+
+   eed = (Ea_Editfield_Data *)evas_object_data_get(obj, EA_EF_KEY_DATA);
+   if (eed && !(eed->clear_btn_disabled)
+       && elm_object_part_content_get(obj, "elm.swallow.clear"))
      {
         if (elm_object_focus_get(obj))
           {
@@ -17,7 +28,11 @@ static void _editfield_changed_cb(void *data, Evas_Object *obj, void *event_info
 
 static void _editfield_focused_cb(void *data, Evas_Object *obj, void *event_info)
 {
-   if (elm_object_part_content_get(obj, "elm.swallow.clear"))
+   Ea_Editfield_Data *eed;
+
+   eed = (Ea_Editfield_Data *)evas_object_data_get(obj, EA_EF_KEY_DATA);
+   if (eed && !(eed->clear_btn_disabled)
+       && elm_object_part_content_get(obj, "elm.swallow.clear"))
      {
         if (!elm_entry_is_empty(obj))
           elm_object_signal_emit(obj, "elm,state,clear,visible", "");
@@ -29,7 +44,11 @@ static void _editfield_focused_cb(void *data, Evas_Object *obj, void *event_info
 
 static void _editfield_unfocused_cb(void *data, Evas_Object *obj, void *event_info)
 {
-   if (elm_object_part_content_get(obj, "elm.swallow.clear"))
+   Ea_Editfield_Data *eed;
+
+   eed = (Ea_Editfield_Data *)evas_object_data_get(obj, EA_EF_KEY_DATA);
+   if (eed && !(eed->clear_btn_disabled)
+       && elm_object_part_content_get(obj, "elm.swallow.clear"))
      elm_object_signal_emit(obj, "elm,state,clear,hidden", "");
    elm_object_signal_emit(obj, "elm,state,focus,off", "");
 }
@@ -41,7 +60,11 @@ static void _eraser_btn_clicked_cb(void *data, Evas_Object *obj, void *event_inf
 
 static void _editfield_searchbar_changed_cb(void *data, Evas_Object *obj, void *event_info)
 {
-   if (elm_object_part_content_get(obj, "elm.swallow.clear"))
+   Ea_Editfield_Data *eed;
+
+   eed = (Ea_Editfield_Data *)evas_object_data_get(obj, EA_EF_KEY_DATA);
+   if (eed && !(eed->clear_btn_disabled)
+       && elm_object_part_content_get(obj, "elm.swallow.clear"))
      {
         if (elm_entry_is_empty(obj))
           elm_object_signal_emit(obj, "elm,state,clear,hidden", "");
@@ -64,6 +87,7 @@ EXPORT_API Evas_Object *
 ea_editfield_add(Evas_Object *parent, Ea_Editfield_Type type)
 {
    Evas_Object *entry, *button;
+   Ea_Editfield_Data *eed;
 
    entry = elm_entry_add(parent);
 
@@ -137,5 +161,36 @@ ea_editfield_add(Evas_Object *parent, Ea_Editfield_Type type)
         evas_object_smart_callback_add(entry, "unfocused", _editfield_unfocused_cb, NULL);
      }
 
+   eed = calloc(1, sizeof(Ea_Editfield_Data));
+   eed->clear_btn_disabled = EINA_FALSE;
+   evas_object_data_set(entry, EA_EF_KEY_DATA, eed);
    return entry;
+}
+
+EXPORT_API void
+ea_editfield_clear_button_disabled_set(Evas_Object *obj, Eina_Bool disable)
+{
+   Ea_Editfield_Data *eed;
+
+   eed = evas_object_data_get(obj, EA_EF_KEY_DATA);
+   if (eed)
+     {
+        eed->clear_btn_disabled = !!disable;
+        if (eed->clear_btn_disabled)
+          elm_object_signal_emit(obj, "elm,state,clear,hidden", "");
+     }
+}
+
+EXPORT_API Eina_Bool
+ea_editfield_clear_button_disabled_get(Evas_Object *obj)
+{
+   Ea_Editfield_Data *eed;
+
+   if (!obj)
+     return EINA_FALSE;
+   eed = evas_object_data_get(obj, EA_EF_KEY_DATA);
+   if (!eed)
+     return EINA_FALSE;
+
+   return eed->clear_btn_disabled;
 }
