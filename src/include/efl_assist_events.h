@@ -61,6 +61,8 @@ ea_naviframe_more_cb(void *data, Evas_Object *obj, void *event_info)
    Evas_Object *more_btn = elm_object_item_part_content_get(top, "toolbar_more_btn");
    if (more_btn)
      evas_object_smart_callback_call(more_btn, "clicked", NULL);
+   else
+     elm_object_item_signal_emit(top, "elm,action,more_event", "");
 }
 
 /**
