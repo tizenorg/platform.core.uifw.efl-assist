@@ -1,6 +1,6 @@
 Name:       efl-assist
 Summary:    EFL assist library
-Version:    0.1.12
+Version:    0.1.12r01
 Release:    1
 Group:      System/Libraries
 License:    APLv2
