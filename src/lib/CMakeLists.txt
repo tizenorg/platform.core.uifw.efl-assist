@@ -9,7 +9,8 @@ else (DESKTOP)
 	SET(LIB_SRCS
 		efl_assist.c
 		efl_assist_editfield.c
-		efl_assist_events.c)
+		efl_assist_events.c
+		efl_assist_screen_reader.c)
 endif (DESKTOP)
 
 ADD_LIBRARY(${LIB_NAME} SHARED ${LIB_SRCS})
@@ -19,7 +20,7 @@ if (DESKTOP)
 	ADD_DEFINITIONS("-DDESKTOP=1")
 	ADD_DEFINITIONS("-DEXPORT_API=__attribute__((visibility(\"default\")))")
 else (DESKTOP)
-	PKG_CHECK_MODULES(LIB_PKGS REQUIRED elementary capi-base-common capi-appfw-application)
+	PKG_CHECK_MODULES(LIB_PKGS REQUIRED elementary capi-base-common capi-appfw-application vconf tts)
 endif (DESKTOP)
 
 FOREACH(flag ${LIB_PKGS_CFLAGS})

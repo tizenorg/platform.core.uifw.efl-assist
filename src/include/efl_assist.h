@@ -21,6 +21,7 @@
 
 #include "efl_assist_editfield.h"
 #include "efl_assist_events.h"
+#include "efl_assist_screen_reader.h"
 
 #endif /* __EFL_ASSIST_H__ */
 

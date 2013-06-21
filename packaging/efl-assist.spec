@@ -10,6 +10,8 @@ BuildRequires:  pkgconfig(dlog)
 BuildRequires:  pkgconfig(capi-base-common)
 BuildRequires:  pkgconfig(capi-appfw-application)
 BuildRequires:  cmake
+BuildRequires:  pkgconfig(vconf)
+BuildRequires:  pkgconfig(tts)
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 
