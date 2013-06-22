@@ -79,6 +79,8 @@ Evas_Object *ea_editfield_add(Evas_Object *parent, Ea_Editfield_Type type);
  *
  * @details Disable the clear button. If @param disable is EINA_TRUE, it will hide the clear button always.
  *          If @param disable is EINA_FALSE, the clear button will be shown or hidden automatically.
+ *          Basically, the clear button will be shown when the text is not empty and
+ *          be hidden when the text is empty or the entry loses focus.
  *
  * @param [in] obj the entry widget object
  * @param [in] disable EINA_TRUE : the clear button will be hidden always
