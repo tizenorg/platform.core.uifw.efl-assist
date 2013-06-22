@@ -50,20 +50,21 @@ typedef enum
  *
  * @details Add an elementary entry widget with some special features.
  *          The first is clear button that will delete all characters in current entry widget.
- *          The second is rename icon which symbolizes the editable field in dialogue view.
- *          Visible state of each clear button and rename icon will be changed automatically.
+ *          The second is search icon which symbolizes the search field in search bar.
+ *          Visible state of the clear button will be changed automatically.
  *          This API will return an elementary entry widget, and some elm_entry APIs can change
  *          the internal state of this widget. For maintaining the original states of entry widget,
  *          following signal emitting is needed :
  *
- *          1. For maintaining visible state of rename icon :
- *                 "elm,state,rename,visible", "elm,state,rename,hidden"
- *
- *          2. For maintaining visible state of clear button :
+ *          1. For maintaining visible state of clear button :
  *                 "elm,state,clear,visible", "elm,state,clear,hidden"
  *
- *          3. For maintaining scrollable state of entry :
+ *          2. For maintaining scrollable state of entry :
  *                 "elm,state,scroll,enabled", "elm,state,scroll,disabled"
+ *
+ *          The visible state of search icon can be changed by the following EFL elementary API :
+ *
+ *          EAPI void elm_entry_icon_visible_set(Evas_Object *obj, Eina_Bool setting)
  *
  *
  * @param [in] parent The parent widget object
