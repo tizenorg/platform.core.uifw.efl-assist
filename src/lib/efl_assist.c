@@ -74,11 +74,6 @@ _magic_string_get(ea_magic m)
 __CONSTRUCTOR__ static void
 ea_mod_init(void)
 {
-	if (!elm_init(0, NULL)) {
-		fprintf(stderr, "could not initialize elementary.\n");
-		return;
-	}
-
 	ea_init();
 
 	DBG("loaded");
@@ -90,7 +85,6 @@ ea_mod_shutdown(void)
 	DBG("unloaded");
 
 	ea_shutdown();
-	elm_shutdown();
 }
 
 
