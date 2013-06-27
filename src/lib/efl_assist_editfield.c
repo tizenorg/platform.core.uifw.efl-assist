@@ -139,11 +139,6 @@ ea_editfield_add(Evas_Object *parent, Ea_Editfield_Type type)
    if (type == EA_EDITFIELD_SEARCHBAR)
      {
         button = elm_button_add(parent);
-        elm_object_style_set(button, "search_icon");
-        elm_object_focus_allow_set(button, EINA_FALSE);
-        elm_object_part_content_set(entry, "elm.swallow.icon", button);
-
-        button = elm_button_add(parent);
         elm_object_style_set(button, "search_clear");
         elm_object_focus_allow_set(button, EINA_FALSE);
         elm_object_part_content_set(entry, "elm.swallow.clear", button);
