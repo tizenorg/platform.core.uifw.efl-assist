@@ -13,6 +13,8 @@ typedef struct _Ea_Object_Event
    Evas_Object *obj;
    Evas_Object *parent;
    Eina_List *callbacks;
+   Eina_Bool delete_me : 1;
+   Eina_Bool on_callback : 1;
 } Ea_Object_Event;
 
 typedef struct _Ea_Event_Callback
@@ -234,11 +236,15 @@ _ea_key_grab_rect_key_up_cb(void *data, Evas *e, Evas_Object *obj,
    else if (!strcmp(ev->keyname, EA_KEY_SEND))
      type = EA_CALLBACK_MORE;
 
+   obj_event->on_callback = EINA_TRUE;
    EINA_LIST_FOREACH(obj_event->callbacks, l, callback)
      {
+        if (obj_event->delete_me) break;
         if (callback->type != type) continue;
         callback->func(callback->data, obj_event->obj, (void*) type);
      }
+   if (obj_event->delete_me) free(obj_event);
+   else obj_event->on_callback = EINA_FALSE;
 }
 
 static void
@@ -272,32 +278,6 @@ _ea_event_mgr_new(Evas *e)
    _ea_key_grab_obj_create(event_mgr);
 
    return event_mgr;
-}
-
-void
-ea_event_mgr_clear(Ea_Event_Mgr *event_mgr)
-{
-   Ea_Object_Event *obj_event;
-   Ea_Event_Callback *callback;
-   Eina_List *l, *l2;
-
-   //Remove Object Events
-   EINA_LIST_FOREACH(event_mgr->obj_events, l, obj_event)
-     {
-        evas_object_event_callback_del(obj_event->obj, EVAS_CALLBACK_DEL,
-                                       _ea_object_del_cb);
-        //Remove Callbacks
-        EINA_LIST_FOREACH(obj_event->callbacks, l2, callback)
-           free(callback);
-        obj_event->callbacks = eina_list_free(obj_event->callbacks);
-
-        free(obj_event);
-     }
-   event_mgr->obj_events = eina_list_free(event_mgr->obj_events);
-
-   evas_object_del(event_mgr->key_grab_rect);
-
-   free(event_mgr);
 }
 
 EAPI void *
@@ -336,6 +316,13 @@ ea_object_event_callback_del(Evas_Object *obj, Ea_Callback_Type type, Ea_Event_C
      {
         evas_object_data_set(obj, EA_OBJ_KEY_OBJ_EVENT, NULL);
         evas_object_data_set(obj, EA_OBJ_KEY_EVENT_MGR, NULL);
+        Eina_List *l = eina_list_data_find_list(event_mgr->obj_events,
+                                                obj_event);
+        if (l)
+          event_mgr->obj_events = eina_list_remove_list(event_mgr->obj_events,
+                                                        l);
+        if (obj_event->on_callback) obj_event->delete_me = EINA_TRUE;
+        else free(obj_event);
      }
 
    _ea_event_mgr_del(event_mgr);
