@@ -280,6 +280,32 @@ _ea_event_mgr_new(Evas *e)
    return event_mgr;
 }
 
+void
+ea_event_mgr_clear(Ea_Event_Mgr *event_mgr)
+{
+   Ea_Object_Event *obj_event;
+   Ea_Event_Callback *callback;
+   Eina_List *l, *l2;
+
+   //Remove Object Events
+   EINA_LIST_FOREACH(event_mgr->obj_events, l, obj_event)
+     {
+        evas_object_event_callback_del(obj_event->obj, EVAS_CALLBACK_DEL,
+                                       _ea_object_del_cb);
+        //Remove Callbacks
+        EINA_LIST_FOREACH(obj_event->callbacks, l2, callback)
+           free(callback);
+        obj_event->callbacks = eina_list_free(obj_event->callbacks);
+
+        free(obj_event);
+     }
+   event_mgr->obj_events = eina_list_free(event_mgr->obj_events);
+
+   evas_object_del(event_mgr->key_grab_rect);
+
+   free(event_mgr);
+}
+
 EAPI void *
 ea_object_event_callback_del(Evas_Object *obj, Ea_Callback_Type type, Ea_Event_Cb func)
 {
