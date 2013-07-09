@@ -83,13 +83,6 @@ static void _editfield_searchbar_unfocused_cb(void *data, Evas_Object *obj, void
    elm_object_signal_emit(obj, "elm,state,focus,off", "");
 }
 
-static Elm_Access_Info_Cb _editfield_searchbar_access_info_cb(void *data, Evas_Object *obj)
-{
-   const char *txt;
-   txt = "Search bar";
-   return (Elm_Access_Info_Cb)strdup(txt);
-}
-
 EXPORT_API Evas_Object *
 ea_editfield_add(Evas_Object *parent, Ea_Editfield_Type type)
 {
@@ -148,8 +141,6 @@ ea_editfield_add(Evas_Object *parent, Ea_Editfield_Type type)
         evas_object_smart_callback_add(entry, "preedit,changed", _editfield_searchbar_changed_cb, NULL);
         evas_object_smart_callback_add(entry, "focused", _editfield_searchbar_focused_cb, NULL);
         evas_object_smart_callback_add(entry, "unfocused", _editfield_searchbar_unfocused_cb, NULL);
-
-        elm_access_info_cb_set(entry, ELM_ACCESS_TYPE, (Elm_Access_Info_Cb)_editfield_searchbar_access_info_cb, NULL);
      }
    else
      {
