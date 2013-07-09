@@ -58,7 +58,8 @@ _ea_object_del_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
       free(callback);
    obj_event->callbacks = eina_list_free(obj_event->callbacks);
 
-   free(obj_event);
+   if (obj_event->on_callback) obj_event->delete_me = EINA_TRUE;
+   else free(obj_event);
 
    _ea_event_mgr_del(event_mgr);
 }
