@@ -5,13 +5,13 @@ Release:    1
 Group:      System/Libraries
 License:    APLv2
 Source0:    %{name}-%{version}.tar.gz
+BuildRequires:  cmake
 BuildRequires:  pkgconfig(elementary)
 BuildRequires:  pkgconfig(dlog)
-BuildRequires:  pkgconfig(capi-base-common)
-BuildRequires:  pkgconfig(capi-appfw-application)
-BuildRequires:  cmake
 BuildRequires:  pkgconfig(vconf)
 BuildRequires:  pkgconfig(tts)
+BuildRequires:  pkgconfig(capi-base-common)
+BuildRequires:  pkgconfig(capi-appfw-application)
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 

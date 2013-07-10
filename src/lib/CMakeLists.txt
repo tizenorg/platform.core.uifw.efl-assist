@@ -1,27 +1,13 @@
-option(DESKTOP "Build for i386 linux desktop" OFF)
-
-if (DESKTOP)
-	SET(LIB_SRCS
-		efl_assist.c
-		efl_assist_editfield.c
-		efl_assist_events.c)
-else (DESKTOP)
-	SET(LIB_SRCS
-		efl_assist.c
-		efl_assist_editfield.c
-		efl_assist_events.c
-		efl_assist_screen_reader.c)
-endif (DESKTOP)
+SET(LIB_SRCS
+	 efl_assist.c
+	 efl_assist_editfield.c
+	 efl_assist_events.c
+	 efl_assist_screen_reader.c)
 
 ADD_LIBRARY(${LIB_NAME} SHARED ${LIB_SRCS})
 
-if (DESKTOP)
-	PKG_CHECK_MODULES(LIB_PKGS REQUIRED elementary)
-	ADD_DEFINITIONS("-DDESKTOP=1")
-	ADD_DEFINITIONS("-DEXPORT_API=__attribute__((visibility(\"default\")))")
-else (DESKTOP)
-	PKG_CHECK_MODULES(LIB_PKGS REQUIRED elementary capi-base-common capi-appfw-application vconf tts)
-endif (DESKTOP)
+ADD_DEFINITIONS("-DEXPORT_API=__attribute__((visibility(\"default\")))")
+PKG_CHECK_MODULES(LIB_PKGS REQUIRED elementary vconf tts capi-base-common capi-appfw-application dlog)
 
 FOREACH(flag ${LIB_PKGS_CFLAGS})
 	SET(LIB_CFLAGS "${LIB_CFLAGS} ${flag}")

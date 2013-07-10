@@ -22,40 +22,6 @@
  *                                 Local                                     *
  *===========================================================================*/
 
-Ea _ea;
-
-static void
-ea_init(void)
-{
-   memset(&_ea, 0x00, sizeof(_ea));
-
-   _ea.ea_log_dom = eina_log_domain_register("efl-assist",
-                                             EINA_COLOR_LIGHTBLUE);
-   if (!_ea.ea_log_dom)
-     {
-        EINA_LOG_ERR("could not register efl-assist log domain");
-        _ea.ea_log_dom = EINA_LOG_DOMAIN_GLOBAL;
-     }
-}
-
-static void
-ea_shutdown(void)
-{
-   Eina_List *l;
-   Ea_Event_Mgr *event_mgr;
-
-   //Remove Event Managers
-   EINA_LIST_FOREACH(_ea.event_mgrs, l, event_mgr)
-     ea_event_mgr_clear(event_mgr);
-   _ea.event_mgrs = eina_list_free(_ea.event_mgrs);
-
-   if ((_ea.ea_log_dom > - 1) && (_ea.ea_log_dom != EINA_LOG_DOMAIN_GLOBAL))
-     {
-        eina_log_domain_unregister(_ea.ea_log_dom);
-        _ea.ea_log_dom = -1;
-     }
-}
-
 static const char *
 _magic_string_get(ea_magic m)
 {
@@ -74,17 +40,11 @@ _magic_string_get(ea_magic m)
 __CONSTRUCTOR__ static void
 ea_mod_init(void)
 {
-	ea_init();
-
-	DBG("loaded");
 }
 
 __DESTRUCTOR__ static void
 ea_mod_shutdown(void)
 {
-	DBG("unloaded");
-
-	ea_shutdown();
 }
 
 
@@ -95,14 +55,14 @@ ea_mod_shutdown(void)
 void
 _ea_magic_fail(const void *d, ea_magic m, ea_magic req_m, const char *fname)
 {
-	ERR("\n*** MAGIC FAIL (%s) ***\n", fname);
+	LOGE("\n*** MAGIC FAIL (%s) ***\n", fname);
 
 	if (!d)
-		ERR("  Input handle pointer is NULL!");
+		LOGE("  Input handle pointer is NULL!");
 	else if (m == EA_MAGIC_NONE)
-		ERR("  Input handle has already been freed!");
+		LOGE("  Input handle has already been freed!");
 	else if (m != req_m)
-		ERR("  Input handle is wrong type\n"
+		LOGE("  Input handle is wrong type\n"
 		    "    Expected: %08x - %s\n"
 		    "    Supplied: %08x - %s",
 		    (unsigned int)req_m, _magic_string_get(req_m),

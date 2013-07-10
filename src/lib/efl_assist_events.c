@@ -1,6 +1,8 @@
 #include "efl_assist.h"
 #include "efl_assist_private.h"
 
+typedef struct _Ea_Event_Mgr Ea_Event_Mgr;
+
 struct _Ea_Event_Mgr
 {
    Eina_List *obj_events;
@@ -26,9 +28,13 @@ typedef struct _Ea_Event_Callback
 
 const char *EA_OBJ_KEY_EVENT_MGR = "_ea_obj_key_event_mgr";
 const char *EA_OBJ_KEY_OBJ_EVENT = "_ea_obj_key_obj_event";
-const char *EA_KEY_BACK = "XF86Stop";
-const char *EA_KEY_BACK2 = "Escape";
+const char *EA_KEY_STOP = "XF86Stop";
+const char *EA_KEY_STOP2 = "Escape";
 const char *EA_KEY_SEND = "XF86Send";
+const char *EA_KEY_SEND2 = "Menu";
+
+
+static Eina_List *event_mgrs = NULL;
 
 static void
 _ea_event_mgr_del(Ea_Event_Mgr *event_mgr)
@@ -37,7 +43,7 @@ _ea_event_mgr_del(Ea_Event_Mgr *event_mgr)
 
    //Redundant Event Mgr. Remove it.
    evas_object_del(event_mgr->key_grab_rect);
-   _ea.event_mgrs = eina_list_remove(_ea.event_mgrs, event_mgr);
+   event_mgrs = eina_list_remove(event_mgrs, event_mgr);
    free(event_mgr);
 }
 
@@ -232,10 +238,12 @@ _ea_key_grab_rect_key_up_cb(void *data, Evas *e, Evas_Object *obj,
    obj_event = _ea_top_obj_event_find(event_mgr);
    if (!obj_event) return;
 
-   if (!strcmp(ev->keyname, EA_KEY_BACK) || !strcmp(ev->keyname, EA_KEY_BACK2))
+   if (!strcmp(ev->keyname, EA_KEY_STOP) || !strcmp(ev->keyname, EA_KEY_STOP2))
      type = EA_CALLBACK_BACK;
-   else if (!strcmp(ev->keyname, EA_KEY_SEND))
+   else if (!strcmp(ev->keyname, EA_KEY_SEND) ||
+            !strcmp(ev->keyname, EA_KEY_SEND2))
      type = EA_CALLBACK_MORE;
+   else return;
 
    obj_event->on_callback = EINA_TRUE;
    EINA_LIST_FOREACH(obj_event->callbacks, l, callback)
@@ -255,14 +263,18 @@ _ea_key_grab_obj_create(Ea_Event_Mgr *event_mgr)
 
    evas_object_event_callback_add(key_grab_rect, EVAS_CALLBACK_KEY_UP,
                                   _ea_key_grab_rect_key_up_cb, event_mgr);
-   if (!evas_object_key_grab(key_grab_rect, EA_KEY_BACK, 0, 0, EINA_FALSE))
-     CRITICAL("Failed to grab END KEY\n");
+   if (!evas_object_key_grab(key_grab_rect, EA_KEY_STOP, 0, 0, EINA_FALSE))
+     LOGE("Failed to grab END KEY\n");
 
-   if (!evas_object_key_grab(key_grab_rect, EA_KEY_BACK2, 0, 0, EINA_FALSE))
-     CRITICAL("Failed to grab END KEY\n");
+   if (!evas_object_key_grab(key_grab_rect, EA_KEY_STOP2, 0, 0, EINA_FALSE))
+     LOGE("Failed to grab END KEY\n");
 
    if (!evas_object_key_grab(key_grab_rect, EA_KEY_SEND, 0, 0, EINA_FALSE))
-     CRITICAL("Failed to grab MORE KEY\n");
+     LOGE("Failed to grab MORE KEY\n");
+
+   if (!evas_object_key_grab(key_grab_rect, EA_KEY_SEND2, 0, 0, EINA_FALSE))
+     LOGE("Failed to grab MORE KEY\n");
+
    event_mgr->key_grab_rect = key_grab_rect;
 }
 
@@ -272,39 +284,13 @@ _ea_event_mgr_new(Evas *e)
    Ea_Event_Mgr *event_mgr = calloc(1, sizeof(Ea_Event_Mgr));
    if (!event_mgr)
      {
-        ERR("Failed to allocate event manager");
+        LOGE("Failed to allocate event manager");
         return NULL;
      }
    event_mgr->e = e;
    _ea_key_grab_obj_create(event_mgr);
 
    return event_mgr;
-}
-
-void
-ea_event_mgr_clear(Ea_Event_Mgr *event_mgr)
-{
-   Ea_Object_Event *obj_event;
-   Ea_Event_Callback *callback;
-   Eina_List *l, *l2;
-
-   //Remove Object Events
-   EINA_LIST_FOREACH(event_mgr->obj_events, l, obj_event)
-     {
-        evas_object_event_callback_del(obj_event->obj, EVAS_CALLBACK_DEL,
-                                       _ea_object_del_cb);
-        //Remove Callbacks
-        EINA_LIST_FOREACH(obj_event->callbacks, l2, callback)
-           free(callback);
-        obj_event->callbacks = eina_list_free(obj_event->callbacks);
-
-        free(obj_event);
-     }
-   event_mgr->obj_events = eina_list_free(event_mgr->obj_events);
-
-   evas_object_del(event_mgr->key_grab_rect);
-
-   free(event_mgr);
 }
 
 EAPI void *
@@ -322,7 +308,7 @@ ea_object_event_callback_del(Evas_Object *obj, Ea_Callback_Type type, Ea_Event_C
 
    if (!event_mgr || !obj_event)
      {
-        WRN("This object(%p) hasn't been registered before", obj);
+        LOGW("This object(%p) hasn't been registered before", obj);
         return NULL;
      }
 
@@ -370,7 +356,7 @@ ea_object_event_callback_add(Evas_Object *obj, Ea_Callback_Type type, Ea_Event_C
    //Check the registered event manager for this Evas.
    e = evas_object_evas_get(obj);
 
-   EINA_LIST_FOREACH(_ea.event_mgrs, l, event_mgr)
+   EINA_LIST_FOREACH(event_mgrs, l, event_mgr)
      {
         if (event_mgr->e == e)
           {
@@ -383,7 +369,7 @@ ea_object_event_callback_add(Evas_Object *obj, Ea_Callback_Type type, Ea_Event_C
    if (new_event_mgr)
      {
         if (!(event_mgr = _ea_event_mgr_new(e))) return;
-        _ea.event_mgrs = eina_list_append(_ea.event_mgrs, event_mgr);
+        event_mgrs = eina_list_append(event_mgrs, event_mgr);
      }
 
    obj_event = evas_object_data_get(obj, EA_OBJ_KEY_OBJ_EVENT);
@@ -394,7 +380,7 @@ ea_object_event_callback_add(Evas_Object *obj, Ea_Callback_Type type, Ea_Event_C
         obj_event = calloc(1, sizeof(Ea_Object_Event));
         if (!obj_event)
           {
-             ERR("Failed to allocate object event");
+             LOGE("Failed to allocate object event");
              return;
           }
         evas_object_data_set(obj, EA_OBJ_KEY_OBJ_EVENT, obj_event);
@@ -411,7 +397,7 @@ ea_object_event_callback_add(Evas_Object *obj, Ea_Callback_Type type, Ea_Event_C
    callback = calloc(1, sizeof(Ea_Event_Callback));
    if (!callback)
      {
-        ERR("Failed to allocate event callback");
+        LOGE("Failed to allocate event callback");
         return;
      }
    callback->type = type;

@@ -20,9 +20,6 @@
 
 #include <Elementary.h>
 #include <stdbool.h>
-#ifndef DESKTOP
-	#include <tizen.h>
-#endif
 
 #ifdef __cplusplus
 extern "C" {

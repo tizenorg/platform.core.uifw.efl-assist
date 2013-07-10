@@ -23,6 +23,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
+#include <tizen.h>
+#include <app.h>
+#include <dlog.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,25 +53,6 @@ typedef unsigned int ea_magic;
 
 void _ea_magic_fail(const void *d, ea_magic m,
 		    ea_magic req_m, const char *fname);
-
-#define CRITICAL(...) EINA_LOG_DOM_CRIT(_ea.ea_log_dom, __VA_ARGS__)
-#define ERR(...)      EINA_LOG_DOM_ERR(_ea.ea_log_dom, __VA_ARGS__)
-#define WRN(...)      EINA_LOG_DOM_WARN(_ea.ea_log_dom, __VA_ARGS__)
-#define INF(...)      EINA_LOG_DOM_INFO(_ea.ea_log_dom, __VA_ARGS__)
-#define DBG(...)      EINA_LOG_DOM_DBG(_ea.ea_log_dom, __VA_ARGS__)
-
-typedef struct _Ea Ea;
-typedef struct _Ea_Event_Mgr Ea_Event_Mgr;
-
-struct _Ea
-{
-   Eina_List *event_mgrs;
-   int ea_log_dom;
-};
-
-extern Ea _ea;
-
-void ea_event_mgr_clear(Ea_Event_Mgr *event_mgr);
 
 #ifdef __cplusplus
 }
