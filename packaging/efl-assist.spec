@@ -38,7 +38,7 @@ EFL assist library providing small utility functions (devel)
 %build
 export CFLAGS+=" -fvisibility=hidden"
 export LDFLAGS+=" -fvisibility=hidden"
-cmake . -DCMAKE_INSTALL_PREFIX=/usr
+%cmake . -DCMAKE_INSTALL_PREFIX=/usr
 
 make %{?jobs:-j%jobs}
 
