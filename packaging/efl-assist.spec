@@ -12,6 +12,7 @@ BuildRequires:  pkgconfig(vconf)
 BuildRequires:  pkgconfig(tts)
 BuildRequires:  pkgconfig(capi-base-common)
 BuildRequires:  pkgconfig(capi-appfw-application)
+BuildRequires:  pkgconfig(ecore-x)
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 
