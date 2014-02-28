@@ -1,3 +1,5 @@
+%bcond_with x
+
 Name:       efl-assist
 Summary:    EFL assist library
 Version:    0.1.18r02
@@ -12,7 +14,10 @@ BuildRequires:  pkgconfig(vconf)
 BuildRequires:  pkgconfig(tts)
 BuildRequires:  pkgconfig(capi-base-common)
 BuildRequires:  pkgconfig(capi-appfw-application)
+%if %{with x}
 BuildRequires:  pkgconfig(ecore-x)
+%endif
+
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 
@@ -39,7 +44,14 @@ EFL assist library providing small utility functions (devel)
 %build
 export CFLAGS+=" -fvisibility=hidden"
 export LDFLAGS+=" -fvisibility=hidden"
-%cmake . -DCMAKE_INSTALL_PREFIX=/usr
+
+%cmake . \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+%if %{with x}
+    -DX11_SUPPORT=On \
+%endif
+    #eol
+
 
 make %{?jobs:-j%jobs}
 

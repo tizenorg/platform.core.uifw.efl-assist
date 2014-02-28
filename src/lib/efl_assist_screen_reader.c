@@ -1,6 +1,10 @@
 #include "efl_assist.h"
 #include "efl_assist_private.h"
+
+#ifdef HAVE_X
 #include <Ecore_X.h>
+#endif
+
 #include <vconf.h>
 #include <tts.h>
 #define UNAVAILABLE_TEXT "Screen reader is unavailable during using this application. You can press home or back key to go back to home screen."
@@ -112,6 +116,7 @@ static void _tts_init(void)
 
 static void _timeout_cb(void *data, Evas_Object *obj, void *event_info)
 {
+#ifdef HAVE_X
    Ecore_X_Window xwin;
    unsigned int val;
 
@@ -125,11 +130,15 @@ static void _timeout_cb(void *data, Evas_Object *obj, void *event_info)
      (xwin, ECORE_X_ATOM_E_ILLUME_ACCESS_CONTROL, &val, 1);
 
    _tts_shutdown();
+#else
+   fprintf(stderr, "TODO: workaround: disabled code from " __FILE__ );
+#endif
 }
 
 EAPI Eina_Bool
 ea_screen_reader_support_set(Evas_Object *win, Eina_Bool support)
 {
+#ifdef HAVE_X
    Ecore_X_Window xwin;
    unsigned int val;
    int tts_val;
@@ -170,6 +179,9 @@ ea_screen_reader_support_set(Evas_Object *win, Eina_Bool support)
      }
 
    return EINA_TRUE;
+#else
+   fprintf(stderr, "TODO: workaround: disabled code from " __FILE__ );
+#endif
 }
 
 EAPI Eina_Bool
