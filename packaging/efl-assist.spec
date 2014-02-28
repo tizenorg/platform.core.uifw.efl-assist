@@ -3,9 +3,9 @@
 Name:       efl-assist
 Summary:    EFL assist library
 Version:    0.1.18r02
-Release:    1
+Release:    0
 Group:      System/Libraries
-License:    APLv2
+License:    Apache-2.0
 Source0:    %{name}-%{version}.tar.gz
 BuildRequires:  cmake
 BuildRequires:  pkgconfig(elementary)
@@ -27,7 +27,7 @@ EFL assist library
 
 
 %package devel
-Summary:    EFL assista library (devel)
+Summary:    EFL assist library (devel)
 Group:      Development/Libraries
 Requires:   %{name} = %{version}-%{release}
 Requires:   capi-base-common-devel
@@ -74,7 +74,7 @@ cp %{_builddir}/%{buildsubdir}/LICENSE %{buildroot}/usr/share/license/%{name}
 #%{_bindir}/*
 %{_libdir}/libefl-assist.so.*
 %manifest %{name}.manifest
-/usr/share/license/%{name}
+%license /usr/share/license/%{name}
 
 
 %files devel
