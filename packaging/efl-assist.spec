@@ -1,4 +1,5 @@
 %bcond_with x
+%bcond_with wayland
 
 Name:       efl-assist
 Summary:    EFL assist library
@@ -49,6 +50,13 @@ export LDFLAGS+=" -fvisibility=hidden"
     -DCMAKE_INSTALL_PREFIX=/usr \
 %if %{with x}
     -DX11_SUPPORT=On \
+%else
+    -DX11_SUPPORT=Off \
+%endif
+%if %{with wayland}
+    -DWAYLAND_SUPPORT=On \
+%else
+    -DWAYLAND_SUPPORT=Off \
 %endif
     #eol
 
