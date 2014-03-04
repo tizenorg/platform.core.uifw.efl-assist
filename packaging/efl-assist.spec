@@ -1,4 +1,5 @@
 %bcond_with x
+%bcond_with wayland
 
 Name:       efl-assist
 Summary:    EFL assist library
@@ -16,6 +17,9 @@ BuildRequires:  pkgconfig(capi-base-common)
 BuildRequires:  pkgconfig(capi-appfw-application)
 %if %{with x}
 BuildRequires:  pkgconfig(ecore-x)
+%endif
+%if %{with wayland}
+BuildRequires:  pkgconfig(ecore-wayland)
 %endif
 
 Requires(post): /sbin/ldconfig
@@ -49,6 +53,13 @@ export LDFLAGS+=" -fvisibility=hidden"
     -DCMAKE_INSTALL_PREFIX=/usr \
 %if %{with x}
     -DX11_SUPPORT=On \
+%else
+    -DX11_SUPPORT=Off \
+%endif
+%if %{with wayland}
+    -DWAYLAND_SUPPORT=On \
+%else
+    -DWAYLAND_SUPPORT=Off \
 %endif
     #eol
 

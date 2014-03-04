@@ -1,8 +1,13 @@
 #include "efl_assist.h"
 #include "efl_assist_private.h"
 
+#include <Ecore.h>
+
 #ifdef HAVE_X
 #include <Ecore_X.h>
+#endif
+#ifdef HAVE_WAYLAND
+#include <Ecore_Wayland.h>
 #endif
 
 #include <vconf.h>
@@ -116,30 +121,43 @@ static void _tts_init(void)
 
 static void _timeout_cb(void *data, Evas_Object *obj, void *event_info)
 {
-#ifdef HAVE_X
-   Ecore_X_Window xwin;
+#ifdef HAVE_WAYLAND
+    Ecore_Wl_Window *w;
+#elif HAVE_X
+    Ecore_X_Window w;
+#endif
+
    unsigned int val;
 
-   xwin = elm_win_xwindow_get(data);
-   if (!xwin) return;
+#ifdef HAVE_WAYLAND
+   w = elm_win_wl_window_get(data);
+#elif HAVE_X
+   w = elm_win_xwindow_get(data);
+#endif
+   if (!w) return;
 
    evas_object_del(obj);
 
+#ifdef HAVE_X
    val = 2;
    ecore_x_window_prop_card32_set
-     (xwin, ECORE_X_ATOM_E_ILLUME_ACCESS_CONTROL, &val, 1);
-
-   _tts_shutdown();
+     (win, ECORE_X_ATOM_E_ILLUME_ACCESS_CONTROL, &val, 1);
 #else
-   fprintf(stderr, "TODO: workaround: disabled code from " __FILE__ );
+   fprintf(stderr, "TODO: workaround: disabled code from "
+	   __FILE__ ":%d:", __LINE__);
 #endif
+   _tts_shutdown();
+
 }
 
 EAPI Eina_Bool
 ea_screen_reader_support_set(Evas_Object *win, Eina_Bool support)
 {
-#ifdef HAVE_X
-   Ecore_X_Window xwin;
+#ifdef HAVE_WAYLAND
+   Ecore_Wl_Window *w;
+#elif HAVE_X
+   Ecore_X_Window w;
+#endif
    unsigned int val;
    int tts_val;
    Evas_Object *base;
@@ -153,16 +171,25 @@ ea_screen_reader_support_set(Evas_Object *win, Eina_Bool support)
 
    if (!win) return EINA_FALSE;
 
-   xwin = elm_win_xwindow_get(win);
-   if (!xwin) return EINA_FALSE;
+#ifdef HAVE_WAYLAND
+   w = elm_win_wl_window_get(win);
+#elif HAVE_X
+   w = elm_win_xwindow_get(win);
+#endif
+
+   if (!w) return EINA_FALSE;
 
    if (support)
      {
         val = 0;
         elm_config_access_set(EINA_TRUE);
-
+#ifdef HAVE_X
         ecore_x_window_prop_card32_set
-          (xwin, ECORE_X_ATOM_E_ILLUME_ACCESS_CONTROL, &val, 1);
+          (w, ECORE_X_ATOM_E_ILLUME_ACCESS_CONTROL, &val, 1);
+#else
+        fprintf(stderr, "TODO: workaround: disabled code from "
+		__FILE__ ":%d:", __LINE__);
+#endif
      }
    else
      {
@@ -179,9 +206,6 @@ ea_screen_reader_support_set(Evas_Object *win, Eina_Bool support)
      }
 
    return EINA_TRUE;
-#else
-   fprintf(stderr, "TODO: workaround: disabled code from " __FILE__ );
-#endif
 }
 
 EAPI Eina_Bool
