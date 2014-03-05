@@ -121,18 +121,18 @@ static void _tts_init(void)
 
 static void _timeout_cb(void *data, Evas_Object *obj, void *event_info)
 {
-#ifdef HAVE_WAYLAND
-    Ecore_Wl_Window *w;
-#elif HAVE_X
-    Ecore_X_Window w;
+#ifdef HAVE_X
+   Ecore_X_Window w;
+#elif defined HAVE_WAYLAND
+   Ecore_Wl_Window *w;
 #endif
 
    unsigned int val;
 
-#ifdef HAVE_WAYLAND
-   w = elm_win_wl_window_get(data);
-#elif HAVE_X
+#ifdef HAVE_X
    w = elm_win_xwindow_get(data);
+#elif defined HAVE_WAYLAND
+   w = elm_win_wl_window_get(data);
 #endif
    if (!w) return;
 
@@ -153,10 +153,10 @@ static void _timeout_cb(void *data, Evas_Object *obj, void *event_info)
 EAPI Eina_Bool
 ea_screen_reader_support_set(Evas_Object *win, Eina_Bool support)
 {
-#ifdef HAVE_WAYLAND
-   Ecore_Wl_Window *w;
-#elif HAVE_X
+#ifdef HAVE_X
    Ecore_X_Window w;
+#elif defined HAVE_WAYLAND
+   Ecore_Wl_Window *w;
 #endif
    unsigned int val;
    int tts_val;
