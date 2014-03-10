@@ -3,7 +3,7 @@
 
 #include <Ecore.h>
 
-#ifdef HAVE_X
+#ifdef HAVE_X11
 #include <Ecore_X.h>
 #endif
 #ifdef HAVE_WAYLAND
@@ -121,42 +121,44 @@ static void _tts_init(void)
 
 static void _timeout_cb(void *data, Evas_Object *obj, void *event_info)
 {
-#ifdef HAVE_X
-   Ecore_X_Window w;
-#elif defined HAVE_WAYLAND
-   Ecore_Wl_Window *w;
+#ifdef HAVE_X11
+   Ecore_X_Window xwin=0;
 #endif
-
+#ifdef HAVE_WAYLAND
+   Ecore_Wl_Window *wwin=0;
+#endif
    unsigned int val;
 
-#ifdef HAVE_X
-   w = elm_win_xwindow_get(data);
-#elif defined HAVE_WAYLAND
-   w = elm_win_wl_window_get(data);
+#ifdef HAVE_X11
+   xwin = elm_win_xwindow_get(data);
+   if (xwin>0) {
+     evas_object_del(obj); obj=0;
+     val = 2;
+     ecore_x_window_prop_card32_set
+       (xwin, ECORE_X_ATOM_E_ILLUME_ACCESS_CONTROL, &val, 1);
+   } else
 #endif
-   if (!w) return;
+     {
+#ifdef HAVE_WAYLAND
+     wwin = elm_win_wl_window_get(data);
+     if (wwin != NULL) {
+       evas_object_del(obj); obj=0;
 
-   evas_object_del(obj);
-
-#ifdef HAVE_X
-   val = 2;
-   ecore_x_window_prop_card32_set
-     (win, ECORE_X_ATOM_E_ILLUME_ACCESS_CONTROL, &val, 1);
-#else
-   fprintf(stderr, "TODO: workaround: disabled code from "
-	   __FILE__ ":%d:", __LINE__);
+       fprintf(stderr, "TODO: workaround: disabled code from "
+	       __FILE__ ":%d:", __LINE__);
+     }
 #endif
+   }
    _tts_shutdown();
-
 }
 
 EAPI Eina_Bool
 ea_screen_reader_support_set(Evas_Object *win, Eina_Bool support)
 {
-#ifdef HAVE_X
-   Ecore_X_Window w;
+#ifdef HAVE_X11
+   Ecore_X_Window w=0;
 #elif defined HAVE_WAYLAND
-   Ecore_Wl_Window *w;
+   Ecore_Wl_Window *w=0;
 #endif
    unsigned int val;
    int tts_val;
@@ -173,7 +175,7 @@ ea_screen_reader_support_set(Evas_Object *win, Eina_Bool support)
 
 #ifdef HAVE_WAYLAND
    w = elm_win_wl_window_get(win);
-#elif HAVE_X
+#elif HAVE_X11
    w = elm_win_xwindow_get(win);
 #endif
 
@@ -183,7 +185,7 @@ ea_screen_reader_support_set(Evas_Object *win, Eina_Bool support)
      {
         val = 0;
         elm_config_access_set(EINA_TRUE);
-#ifdef HAVE_X
+#ifdef HAVE_X11
         ecore_x_window_prop_card32_set
           (w, ECORE_X_ATOM_E_ILLUME_ACCESS_CONTROL, &val, 1);
 #else
