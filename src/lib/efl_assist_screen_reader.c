@@ -141,11 +141,11 @@ static void _timeout_cb(void *data, Evas_Object *obj, void *event_info)
 {
 #ifdef HAVE_X11
    Ecore_X_Window xwin=0;
+   unsigned int val;
 #endif
 #ifdef HAVE_WAYLAND
    Ecore_Wl_Window *wwin=0;
 #endif
-   unsigned int val;
 
 #ifdef HAVE_X11
    xwin = elm_win_xwindow_get(data);
@@ -175,13 +175,11 @@ ea_screen_reader_support_set(Evas_Object *win, Eina_Bool support)
 {
 #ifdef HAVE_X11
    Ecore_X_Window w=0;
+   unsigned int val;
 #elif defined HAVE_WAYLAND
    Ecore_Wl_Window *w=0;
 #endif
-   unsigned int val;
    int tts_val;
-   Evas_Object *base;
-   Evas_Object *body;
    Evas_Object *popup;
 
    if (vconf_get_bool(VCONFKEY_SETAPPL_ACCESSIBILITY_TTS, &tts_val) != 0)
@@ -201,9 +199,9 @@ ea_screen_reader_support_set(Evas_Object *win, Eina_Bool support)
 
    if (support)
      {
-        val = 0;
         elm_config_access_set(EINA_TRUE);
 #ifdef HAVE_X11
+        val = 0;
         ecore_x_window_prop_card32_set
           (w, ECORE_X_ATOM_E_ILLUME_ACCESS_CONTROL, &val, 1);
 #else
